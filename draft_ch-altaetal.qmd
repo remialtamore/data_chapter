@@ -1,0 +1,78 @@
+---
+title: "Long Memory Process Detection in Idiographic Educational Data Using R"
+author: 
+   - name: "Rémi Altamore"
+   - name: "Clément Roume"
+   - name: "Anne Teboul"
+   - name: "Christophe Gernigon"
+  
+format: 
+  html:
+    df-print: "paged"
+    fig-align: "center"
+crossref:
+  fig-title: '**Figure**'
+  fig-labels: arabic
+dpi: 100
+bibliography: references.bib
+csl: springer.cls
+abstract: ""
+keywords: "long memory process, pink noise, person-specific methods, achievement goal, learning analytics"
+---
+
+## 1 Introduction
+
+As they say [@gernigon_how_2023; @gernigon_rethinking_2015; @saqr_capturing_2024; @peng_quantification_1995; @van_geert_toward_2022].
+
+## 3 Applications in R
+
+### 3.1 Libraries used
+
+Whittle's MLE was originally coded using MATLAB language, see @roume2023. However, we can translate the MATLAB algorithm into R code using only the `stats` package, which is a basic package—automatically installed—on R. This package contains a set of useful functions for many statistical calculations. As in other chapters, we will use `rio` to import and load data into R. We will use the `ggplot2` package to plot our data (i.e., an idiographic time series). You can install these three packages using the `install.packages()` function.
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, include=FALSE}
+if (!require("stats")) install.packages("stats")
+if (!require("rio")) install.packages("rio")
+if (!require("ggplot2")) install.packages("ggplot2")
+
+```
+
+```{r, message = FALSE, error = FALSE, warning = FALSE, results = FALSE, eval = FALSE}
+install.packages("stats")
+install.packages("rio")
+install.packages("ggplot2")
+```
+
+You can then load these packages with the `library()` function.
+
+```{r, message = FALSE, error = FALSE, warning = FALSE}
+library(stats)
+library(rio)
+library(ggplot2)
+```
+
+### 3.2 Data visualization
+
+First, we load the data and then visualize it using `ggplot2`. Below, we use `import()` function from `rio` to read the data.
+
+```{r,message = FALSE, error = FALSE, warning = FALSE}
+MotivationData <- import ("https://github.com/remialtamore/data_chapter/raw/main/Motivation.xlsx")
+MotivationData
+```
+
+The dataset comprises two columns of length 111: the first column is the number of weeks ("Week") and the second column is the value of *k* for each week ("MotivK"). To facilitate data visualization, we use `ggplot2` to create a line graph. The reader can refer to chapter 6 of the previous book [@lópez-pernas2024] to understand how to use `ggplot2`.
+
+```{r, fig.align='center', fig.cap = "Line plot of k evolution", fig.width = 6, fig.height = 4}
+#| label: fig-k
+ggplot(MotivationData, aes(x = Week, y = MotivK)) +
+  geom_line(colour = "deepskyblue4", linewidth = 1) +
+  geom_point(colour = "coral", size = 1.5) +
+  labs(x = "Week", y = "k") +
+  scale_x_continuous(breaks = seq(0, 110, by = 10)) +
+  scale_y_continuous(breaks = seq(-1, 1, by = 0.5)) +
+  theme(
+    panel.background = element_rect(fill = "gray95")
+  )
+```
+
+We can see from this plot that the motivational state of the student, whose goal is to defend his thesis, is characterized by varied, non-linear changes from one week to the next. There are significant periods of avoidance motivation (e.g., from week 12 to week 30) and periods of approach motivation (e.g., from week 93 to week 102), but motivation appears more globally unstable, oscillating regularly towards approach or avoidance from a *k* that frequently remains around 0.
